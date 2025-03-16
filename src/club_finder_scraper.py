@@ -68,11 +68,7 @@ def scrape(weblet_url, target_element, parent_container_div_class, club_name_div
 
         result = {
             "name": name,
-            "details": {
-                "phone": phone,
-                "email": email,
-                "address": address
-            }
+            "details": { k: v for k, v in { "phone": phone, "email": email, "address": address }.items() if v }
         }
 
         clubs.append(result);
