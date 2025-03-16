@@ -3,6 +3,7 @@ import platform
 import subprocess
 import time
 import json
+import re
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -12,6 +13,24 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+
+def extract_contact_details(details):
+    phone = None
+    email = None
+    address = None
+
+    phone_regex = r"^\+?[\d\s\-]{7,15}$"
+    email_regex = r"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)"
+
+    for detail in details:
+        if re.match(phone_regex, detail):
+            phone = detail
+        elif re.match(email_regex, detail):
+            email = detail
+        else:
+            address = detail
+
+    return phone, email, address
 
 def scrape(weblet_url, target_element, parent_container_div_class, club_name_div_class, details_div_class):
     weblet_url_len = len(weblet_url)
@@ -45,14 +64,17 @@ def scrape(weblet_url, target_element, parent_container_div_class, club_name_div
     for club in club_elements:
         name = club.find_element(By.CSS_SELECTOR, club_name_div_class).text
         details = club.find_elements(By.CSS_SELECTOR, details_div_class)
+        phone, email, address = extract_contact_details([detail.text for detail in details])
 
         result = {
             "name": name,
-            "details": [
-                detail.text for detail in details
-            ]
+            "details": {
+                "phone": phone,
+                "email": email,
+                "address": address
+            }
         }
-        
+
         clubs.append(result);
 
     print(f"Found {len(clubs)} clubs in directory.")
