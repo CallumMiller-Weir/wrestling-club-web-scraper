@@ -1,8 +1,4 @@
-import os
-import platform
-import subprocess
 import time
-import json
 import re
 
 from bs4 import BeautifulSoup
@@ -79,30 +75,3 @@ def scrape(weblet_url, target_element, parent_container_div_class, club_name_div
     driver.quit()
 
     return clubs
-
-def dumpJsonToFile(file_name, data):
-    with open(file_name, 'w') as file:
-        json.dump(data, file, indent=4)
-
-    print(f"Data saved to '{file_name}'")
-
-def openFile(file_name):
-    current_os = platform.system()
-    if current_os == "Windows":
-        subprocess.run(["start", file_name], shell=True)
-    elif current_os == "Linux":
-        subprocess.run(["xdg-open", file_name])
-    else:
-        print(f"Unsupported OS: {current_os}")
-
-WEBLET_URL = "https://britishwrestling.justgo.com/weblets/CoachAndClubFinder/74728f3b-1e94-44fc-8217-e70f15953222/"
-TARGET_ELEMENT = "webletsCoachAndClubFinder74728f3b-1e94-44fc-8217-e70f15953222"
-PARENT_CONTAINER_DIV_CLASS = ".flex.flex-col.md\\:flex-row.relative.space-y-4.md\\:space-y-0.md\\:space-x-4"
-CLUB_NAME_DIV_CLASS = ".text-globalTextSizeLg.font-medium.text-jg-metal-900"
-DETAILS_DIV_CLASS = ".text-jg-metal-800.text-globalTextSizeSm"
-
-clubs = scrape(WEBLET_URL, TARGET_ELEMENT, PARENT_CONTAINER_DIV_CLASS, CLUB_NAME_DIV_CLASS, DETAILS_DIV_CLASS);
-
-file_name = input("Enter a file name (default=\"clubs.json\"): ") or "clubs.json"
-dumpJsonToFile(file_name, clubs)
-openFile(file_name)
